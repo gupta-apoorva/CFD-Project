@@ -6,6 +6,7 @@
 #include "sor.h"
 #include <stdio.h>
 #include <string.h>
+#include "multigrid.h"
 
 
 /**
@@ -93,12 +94,14 @@ int main(int argn, char** args)
    double T_t;
    double T_b;
    
+int ref = 1;
+PetscErrorCode ierr;
 	
 //setting the parameters
 	read_parameters( "problem.dat", &Re ,&Pr, &UI , &VI, &PI, &TI, &GX, &GY, &t_end, &xlength, &ylength, &dt, &dx, &dy, &imax,
 		         &jmax, &alpha, &omg, &tau, &itermax, &eps, &dt_value, &wl, &wr, &wt, &wb, &beta, &T_body,&T_l, &T_r, &T_t, &T_b);
 
-	  pgm = read_pgm("mesh.pgm");
+	  pgm = read_pgm("mesh1.pgm");
    printf("hello " );
 
 // Creating the arrays U,V and P
@@ -166,7 +169,7 @@ int main(int argn, char** args)
 
 int count = 0;
 while (t<t_end)
-  {
+ {
 
 // Calculating the proper time step to maintain stability...
 
@@ -176,14 +179,6 @@ while (t<t_end)
 
       boundaryvalues(imax, jmax, wl , wr, wt, wb , TI, T_body, U, V , P, T, G, F, FLAG, T_l, T_r, T_t, T_b);
 
-    /*      for (int i = 0 ; i<imax+2 ; i++)
-    {
-      for (int j = 0 ; j< jmax+1 ; j++)
-      {
-        printf ("%f ", T[i][j]);
-      }
-      printf("\n");
-    }*/
 
 // Setting the special boundary values based on the problem type...
 
@@ -206,14 +201,16 @@ while (t<t_end)
 
 // residual... 
   
-      double res = 1000;  
+     // double res = 1000;  
 
 // Doing the successive over relaxation...
-      while(it<itermax && res > eps) 
+     /* while(it<itermax && res > eps) 
           {
             sor(omg, dx,dy,imax,jmax, P, RS, &res,FLAG);
             it++; 
-          }
+          }*/
+multigrid(argn, args, RS, P, imax, jmax, ref, dx, dy);
+
 
 // calculating the U and V velocities matrices...
 
@@ -241,6 +238,7 @@ free_matrix(F,0,imax+1,0,jmax+1);
 free_matrix(G,0,imax+1,0,jmax+1);
 free_imatrix(FLAG,0,imax+1,0,jmax+1);
 free_imatrix(pgm,0,imax,0,jmax);
+ierr = PetscFinalize();CHKERRQ(ierr);
 
 return 0;
 }
