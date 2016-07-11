@@ -1,16 +1,4 @@
-
-
 #include "multigrid.h"
-
-
-
-
-
-int multigrid(int argc, char **argv, double **RH, double **P,int imax,int jmax, int ref, double dx, double dy) //typecast 
-{
- return argc;
-}
-
  
 PetscErrorCode ComputeRHS(KSP ksp,Vec b,void *ctx)
 {

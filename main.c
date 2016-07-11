@@ -52,47 +52,47 @@
 int main(int argn, char** args)
 {
 
-   double** U;
-   double** V;
-   double** P;
-   double** T;
-   double Re;
-   double Pr;
-   double beta;               
-   double UI;                
-   double VI;               
-   double PI; 
-   double TI;          
-   double GX;                
-   double GY;                
-   double t_end;            
-   double xlength;          
-   double ylength;           
-   double dt;                
-   double dx;             
-   double dy;               
-   int  imax;                
-   int  jmax;               
-   double alpha;            
-   double omg;               
-   double tau;              
-   int  itermax;             
-   double eps;              
-   double dt_value;          
-   double** RS;
-   double** F;
-   double** G;
-   int** FLAG;
-   int** pgm = NULL;
-   int wl;	
-   int wr;
-   int wt;
-   int wb;
-   double T_body;
-   double T_l;
-   double T_r;
-   double T_t;
-   double T_b;
+  double** U;
+  double** V;
+  double** P;
+  double** T;
+  double Re;
+  double Pr;
+  double beta;               
+  double UI;                
+  double VI;               
+  double PI; 
+  double TI;          
+  double GX;                
+  double GY;                
+  double t_end;            
+  double xlength;          
+  double ylength;           
+  double dt;                
+  double dx;             
+  double dy;               
+  int  imax;                
+  int  jmax;               
+  double alpha;            
+  double omg;               
+  double tau;              
+  int  itermax;             
+  double eps;              
+  double dt_value;          
+  double** RS;
+  double** F;
+  double** G;
+  int** FLAG;
+  int** pgm = NULL;
+  int wl;	
+  int wr;
+  int wt;
+  int wb;
+  double T_body;
+  double T_l;
+  double T_r;
+  double T_t;
+  double T_b;
   KSP            ksp;
   DM             da;
   UserContext    user;
@@ -100,20 +100,19 @@ int main(int argn, char** args)
   PetscErrorCode ierr;
   PetscScalar    **new;
   Vec		 x;
-int argc;
-   
-char** argv = args;
+  int argc;
+
+  char** argv = args;
 	
 //setting the parameters
 	read_parameters( "problem.dat", &Re ,&Pr, &UI , &VI, &PI, &TI, &GX, &GY, &t_end, &xlength, &ylength, &dt, &dx, &dy, &imax,
 		         &jmax, &alpha, &omg, &tau, &itermax, &eps, &dt_value, &wl, &wr, &wt, &wb, &beta, &T_body,&T_l, &T_r, &T_t, &T_b);
 
-	  pgm = read_pgm("mesh.pgm");
-   printf("hello " );
+	pgm = read_pgm("mesh.pgm");
 
 //./sim -da_grid_x 50 -da_grid_y 50 -pc_type mg -pc_mg_levels 1 -mg_levels_0_pc_type lu -mg_levels_0_pc_factor_shift_type NONZERO -ksp_monitor
 
-sprintf(argv[2],"%d",imax);
+/*sprintf(argv[2],"%d",imax);
 sprintf(argv[4],"%d",jmax);
 
 argc = 14;
@@ -133,26 +132,20 @@ argv[12] = "NONZERO";
 argv[13] = "-ksp_monitor";
 //argv[14] = "-1";
 
-char **argn1;
+char **argn1;*/
 
 
-argn1 = (char**)argv;
-PetscInitialize(&argc,&argn1,(char*)0,NULL);
-ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);CHKERRQ(ierr);
-  ierr = DMDACreate2d(PETSC_COMM_WORLD, DM_BOUNDARY_NONE,        DM_BOUNDARY_NONE,DMDA_STENCIL_STAR,-11,-11,PETSC_DECIDE,PETSC_DECIDE,1,1,NULL,NULL,&da);CHKERRQ(ierr);
-  ierr = KSPSetDM(ksp,(DM)da);
-  ierr = DMSetApplicationContext(da,&user);CHKERRQ(ierr);
+   // argn1 = (char**)argv;
+    PetscInitialize(&argn,&args,(char*)0,NULL);
+    ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);CHKERRQ(ierr);
+    ierr = DMDACreate2d(PETSC_COMM_WORLD, DM_BOUNDARY_NONE,DM_BOUNDARY_NONE,DMDA_STENCIL_STAR,-11,-11,PETSC_DECIDE,PETSC_DECIDE,1,1,NULL,NULL,&da);CHKERRQ(ierr);
+    ierr = KSPSetDM(ksp,(DM)da);
+    ierr = DMSetApplicationContext(da,&user);CHKERRQ(ierr);
+    bc          = (PetscInt)NEUMANN; 
+    user.bcType = (BCType)bc;
 
-
-  
-  bc          = (PetscInt)NEUMANN; 
-  user.bcType = (BCType)bc;
-
-ierr = KSPSetComputeOperators(ksp,ComputeJacobian,&user);CHKERRQ(ierr);
-  ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
-
-
-
+    ierr = KSPSetComputeOperators(ksp,ComputeJacobian,&user);CHKERRQ(ierr);
+    ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
 
 // Creating the arrays U,V and P
 	  U = matrix ( 0 , imax+1 , 0 , jmax+1 );
@@ -203,21 +196,12 @@ ierr = KSPSetComputeOperators(ksp,ComputeJacobian,&user);CHKERRQ(ierr);
         FLAG[i][j] = 16*dummy[i+1][j+1] + 8*dummy[i+2][j+1] + 4*dummy[i][j+1] + 2*dummy[i+1][j] + dummy[i+1][j+2]; 				
   	}
 
-   /* for (int i = 0 ; i<imax+2 ; i++)
-    {
-      for (int j = 0 ; j< jmax+1 ; j++)
-      {
-        printf ("%d ", FLAG[i][j]);
-      }
-      printf("\n");
-    }*/
-
     double t=0;   // initialize the time
   	int n = 0;    // number of time steps
 
 
 
-int count = 0;
+  int count = 0; 
 while (t<t_end)
  {
 
@@ -259,19 +243,19 @@ while (t<t_end)
             sor(omg, dx,dy,imax,jmax, P, RS, &res,FLAG);
             it++; 
           }*/
-user.RHS  = RS;
+      user.RHS  = RS;
 
-ierr = KSPSetComputeRHS(ksp,ComputeRHS,&user);CHKERRQ(ierr);
- ierr = KSPSolve(ksp,NULL,NULL);CHKERRQ(ierr);
+      ierr = KSPSetComputeRHS(ksp,ComputeRHS,&user);CHKERRQ(ierr);
+      ierr = KSPSolve(ksp,NULL,NULL);CHKERRQ(ierr);
 
-  KSPGetSolution(ksp,&x);
-  ierr =DMDAVecGetArray(da, x, &new);CHKERRQ(ierr);
+      KSPGetSolution(ksp,&x);
+      ierr =DMDAVecGetArray(da, x, &new);CHKERRQ(ierr);
 
-for(int i = 0;i<imax;i++){
-for(int j = 0;j<jmax;j++){
-   P[i+1][j+1] =new[j][i];
-}
-}
+      for(int i = 0;i<imax;i++){
+      for(int j = 0;j<jmax;j++){
+         P[i+1][j+1] =new[j][i];
+      }
+      }
 //multigrid(argn, args, RS, P, imax, jmax, ref, dx, dy);
 
 
