@@ -100,10 +100,8 @@ int main(int argn, char** args)
   PetscErrorCode ierr;
   PetscScalar    **new;
   Vec		 x;
-  PetscReal      nrm;
 int argc;
    
-int ref = 1;
 char** argv = args;
 	
 //setting the parameters
@@ -112,6 +110,8 @@ char** argv = args;
 
 	  pgm = read_pgm("mesh.pgm");
    printf("hello " );
+
+//./sim -da_grid_x 50 -da_grid_y 50 -pc_type mg -pc_mg_levels 1 -mg_levels_0_pc_type lu -mg_levels_0_pc_factor_shift_type NONZERO -ksp_monitor
 
 sprintf(argv[2],"%d",imax);
 sprintf(argv[4],"%d",jmax);
@@ -247,7 +247,7 @@ while (t<t_end)
 
 // iteration number...
 
-      int it = 0;
+     // int it = 0;
 
 // residual... 
   
