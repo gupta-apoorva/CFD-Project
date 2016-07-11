@@ -13,7 +13,6 @@ PetscErrorCode ComputeTrueSolution(DM, Vec);
 PetscErrorCode VecView_VTK(Vec, const char [], const char []);
 PetscErrorCode  KSPGetSolution(KSP ksp,Vec *v);
 int multigrid(int argc,char **argv, double **RH, double **P,int imax,int jmax, int ref, double dx, double dy);
-static char help[] = "Solves 2D Poisson equation using multigrid.\n\n";
 typedef enum {DIRICHLET, NEUMANN} BCType;
 
 typedef struct {

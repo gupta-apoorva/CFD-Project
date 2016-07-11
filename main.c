@@ -137,7 +137,7 @@ char **argn1;
 
 
 argn1 = (char**)argv;
-PetscInitialize(&argc,&argn1,(char*)0,help);
+PetscInitialize(&argc,&argn1,(char*)0,NULL);
 ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);CHKERRQ(ierr);
   ierr = DMDACreate2d(PETSC_COMM_WORLD, DM_BOUNDARY_NONE,        DM_BOUNDARY_NONE,DMDA_STENCIL_STAR,-11,-11,PETSC_DECIDE,PETSC_DECIDE,1,1,NULL,NULL,&da);CHKERRQ(ierr);
   ierr = KSPSetDM(ksp,(DM)da);
