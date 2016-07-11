@@ -22,7 +22,6 @@ PetscErrorCode ComputeRHS(KSP ksp,Vec b,void *ctx)
   for (j=ys; j<ys+ym; j++) {
     for (i=xs; i<xs+xm; i++) {
       array[j][i] =-Hx*Hy*user->RHS[i+1][j+1];
-	
     }
   }
 
@@ -31,13 +30,13 @@ PetscErrorCode ComputeRHS(KSP ksp,Vec b,void *ctx)
   ierr = VecAssemblyEnd(b);CHKERRQ(ierr);
 
 
-  if (user->bcType == NEUMANN) {
+ /* if (user->bcType == NEUMANN) {
     MatNullSpace nullspace;
 
     ierr = MatNullSpaceCreate(PETSC_COMM_WORLD,PETSC_TRUE,0,0,&nullspace);CHKERRQ(ierr);
     ierr = MatNullSpaceRemove(nullspace,b);CHKERRQ(ierr);
     ierr = MatNullSpaceDestroy(&nullspace);CHKERRQ(ierr);
-  }
+  }*/
   PetscFunctionReturn(0);
 }
 
@@ -51,13 +50,9 @@ PetscErrorCode ComputeJacobian(KSP ksp,Mat J, Mat jac,void *ctx)
   MatStencil     row, col[5];
   DM             da;
 
-
-
   PetscFunctionBeginUser;
   ierr  = KSPGetDM(ksp,&da);CHKERRQ(ierr);
   ierr  = DMDAGetInfo(da,0,&M,&N,0,0,0,0,0,0,0,0,0,0);CHKERRQ(ierr);
-
-
 
   Hx    = 1.0 / (PetscReal)(M);
   Hy    = 1.0 / (PetscReal)(N);

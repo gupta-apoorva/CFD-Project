@@ -19,9 +19,6 @@ OBJ = 	helper.o\
 include ${PETSC_DIR}/lib/petsc/conf/variables
 include ${PETSC_DIR}/lib/petsc/conf/rules
 
-
-
-
 #multigrid: multigrid.o chkopts
 	#gcc -o multigrid multigrid.o ${PETSC_KSP_LIB}
 	
