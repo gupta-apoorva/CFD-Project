@@ -93,16 +93,66 @@ int main(int argn, char** args)
    double T_r;
    double T_t;
    double T_b;
+  KSP            ksp;
+  DM             da;
+  UserContext    user;
+  PetscInt       bc;
+  PetscErrorCode ierr;
+  PetscScalar    **new;
+  Vec		 x;
+  PetscReal      nrm;
+int argc;
    
 int ref = 1;
-PetscErrorCode ierr;
+char** argv = args;
 	
 //setting the parameters
 	read_parameters( "problem.dat", &Re ,&Pr, &UI , &VI, &PI, &TI, &GX, &GY, &t_end, &xlength, &ylength, &dt, &dx, &dy, &imax,
 		         &jmax, &alpha, &omg, &tau, &itermax, &eps, &dt_value, &wl, &wr, &wt, &wb, &beta, &T_body,&T_l, &T_r, &T_t, &T_b);
 
-	  pgm = read_pgm("mesh1.pgm");
+	  pgm = read_pgm("mesh.pgm");
    printf("hello " );
+
+sprintf(argv[2],"%d",imax);
+sprintf(argv[4],"%d",jmax);
+
+argc = 14;
+argv[1] = "-da_grid_x";
+//argv[2] = "3";
+argv[3] = "-da_grid_y";
+//argv[4] = "3";
+argv[5] = "-pc_type";
+argv[6] =  "mg";
+argv[7] = "-pc_mg_levels";
+argv[8] = "1";
+argv[9] = "-mg_levels_0_pc_type";
+argv[10] = "lu";
+
+argv[11] = "-mg_levels_0_pc_factor_shift_type";
+argv[12] = "NONZERO";
+argv[13] = "-ksp_monitor";
+//argv[14] = "-1";
+
+char **argn1;
+
+
+argn1 = (char**)argv;
+PetscInitialize(&argc,&argn1,(char*)0,help);
+ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);CHKERRQ(ierr);
+  ierr = DMDACreate2d(PETSC_COMM_WORLD, DM_BOUNDARY_NONE,        DM_BOUNDARY_NONE,DMDA_STENCIL_STAR,-11,-11,PETSC_DECIDE,PETSC_DECIDE,1,1,NULL,NULL,&da);CHKERRQ(ierr);
+  ierr = KSPSetDM(ksp,(DM)da);
+  ierr = DMSetApplicationContext(da,&user);CHKERRQ(ierr);
+
+
+  
+  bc          = (PetscInt)NEUMANN; 
+  user.bcType = (BCType)bc;
+
+ierr = KSPSetComputeOperators(ksp,ComputeJacobian,&user);CHKERRQ(ierr);
+  ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
+
+
+
 
 // Creating the arrays U,V and P
 	  U = matrix ( 0 , imax+1 , 0 , jmax+1 );
@@ -209,7 +259,20 @@ while (t<t_end)
             sor(omg, dx,dy,imax,jmax, P, RS, &res,FLAG);
             it++; 
           }*/
-multigrid(argn, args, RS, P, imax, jmax, ref, dx, dy);
+user.RHS  = RS;
+
+ierr = KSPSetComputeRHS(ksp,ComputeRHS,&user);CHKERRQ(ierr);
+ ierr = KSPSolve(ksp,NULL,NULL);CHKERRQ(ierr);
+
+  KSPGetSolution(ksp,&x);
+  ierr =DMDAVecGetArray(da, x, &new);CHKERRQ(ierr);
+
+for(int i = 0;i<imax;i++){
+for(int j = 0;j<jmax;j++){
+   P[i+1][j+1] =new[j][i];
+}
+}
+//multigrid(argn, args, RS, P, imax, jmax, ref, dx, dy);
 
 
 // calculating the U and V velocities matrices...
@@ -219,7 +282,8 @@ multigrid(argn, args, RS, P, imax, jmax, ref, dx, dy);
 //Going to the next time step...
 
       t = t+dt;
-      n = n+1;  
+      n = n+1;
+printf("time = %f",t);  
 
       if (count % (int)dt_value == 0)
       write_vtkFile("szProblem.vtk", n, xlength, ylength, imax, jmax,dx, dy, U, V, P, T, FLAG);
@@ -238,6 +302,8 @@ free_matrix(F,0,imax+1,0,jmax+1);
 free_matrix(G,0,imax+1,0,jmax+1);
 free_imatrix(FLAG,0,imax+1,0,jmax+1);
 free_imatrix(pgm,0,imax,0,jmax);
+ierr = DMDestroy(&da);CHKERRQ(ierr);
+ierr = KSPDestroy(&ksp);CHKERRQ(ierr);
 ierr = PetscFinalize();CHKERRQ(ierr);
 
 return 0;

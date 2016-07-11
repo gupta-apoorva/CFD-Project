@@ -118,8 +118,8 @@ void boundaryvalues(int imax,int jmax,int wl, int wr, int wt, int wb, double TI,
 	for(int i=1; i<=imax; i++){
         	P[i][0] = P[i][1];
 			P[i][jmax+1] = P[i][jmax];
-			T[i][0] = 2*T_b + T[i][1];
-			T[i][jmax+1] = 2*T_t + T[i][jmax];
+			T[i][0] = 2*T_b - T[i][1];
+			T[i][jmax+1] = 2*T_t - T[i][jmax];
         	G[i][0] = V[i][0];
         	G[i][jmax] = V[i][jmax]; 
     	}
@@ -127,8 +127,8 @@ void boundaryvalues(int imax,int jmax,int wl, int wr, int wt, int wb, double TI,
 	for(int j=1; j<=jmax; j++){
         	P[0][j] = P[1][j];
 			P[imax+1][j] = P[imax][j];
-        	T[0][j] = 2*T_l - T[1][j];
-			T[imax+1][j] = 2*T_r - T[imax][j];
+        	T[0][j] = 2*T_l + T[1][j];
+			T[imax+1][j] = 2*T_r + T[imax][j];
         	F[0][j] = U[0][j];
         	F[imax][j] = U[imax][j];
 	}

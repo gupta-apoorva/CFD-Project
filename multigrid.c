@@ -1,84 +1,14 @@
-static char help[] = "Solves 2D Poisson equation using multigrid.\n\n";
+
 
 #include "multigrid.h"
 
 
-typedef enum {DIRICHLET, NEUMANN} BCType;
 
-typedef struct {
-  double **RHS;
-  BCType      bcType;
-} UserContext;
 
 
 int multigrid(int argc, char **argv, double **RH, double **P,int imax,int jmax, int ref, double dx, double dy) //typecast 
 {
-  KSP            ksp;
-  DM             da;
-  UserContext    user;
-  PetscInt       bc;
-  PetscErrorCode ierr;
-  PetscScalar    **new;
-  Vec		 x;
-  PetscReal      nrm;
-
-
-
-sprintf(argv[2],"%d",imax);
-sprintf(argv[4],"%d",jmax);
-
-argc = 14;
-argv[1] = "-da_grid_x";
-//argv[2] = "3";
-argv[3] = "-da_grid_y";
-//argv[4] = "3";
-argv[5] = "-pc_type";
-argv[6] =  "mg";
-argv[7] = "-pc_mg_levels";
-argv[8] = "1";
-argv[9] = "-mg_levels_0_pc_type";
-argv[10] = "lu";
-
-argv[11] = "-mg_levels_0_pc_factor_shift_type";
-argv[12] = "NONZERO";
-argv[13] = "-ksp_monitor";
-//argv[14] = "-1";
-
-char **argn;
-
-
-argn = (char**)argv; 
-
-  PetscInitialize(&argc,&argn,(char*)0,help);
-  ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);CHKERRQ(ierr);
-  ierr = DMDACreate2d(PETSC_COMM_WORLD, DM_BOUNDARY_NONE,     DM_BOUNDARY_NONE,DMDA_STENCIL_STAR,-11,-11,PETSC_DECIDE,PETSC_DECIDE,1,1,NULL,NULL,&da);CHKERRQ(ierr);
-  ierr = KSPSetDM(ksp,(DM)da);
-  ierr = DMSetApplicationContext(da,&user);CHKERRQ(ierr);
-
-
-  user.RHS  = RH;
-  bc          = (PetscInt)NEUMANN; 
-  user.bcType = (BCType)bc;
-
-  ierr = KSPSetComputeRHS(ksp,ComputeRHS,&user);CHKERRQ(ierr);
-  ierr = KSPSetComputeOperators(ksp,ComputeJacobian,&user);CHKERRQ(ierr);
-  ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
-  ierr = KSPSolve(ksp,NULL,NULL);CHKERRQ(ierr);
-
-  KSPGetSolution(ksp,&x);
-  ierr =DMDAVecGetArray(da, x, &new);CHKERRQ(ierr);
-
-for(int i = 0;i<imax;i++){
-for(int j = 0;j<jmax;j++){
-   P[i+1][j+1] =new[i][j];
-}
-}
-
-
-  ierr = DMDestroy(&da);CHKERRQ(ierr);
-  ierr = KSPDestroy(&ksp);CHKERRQ(ierr);
-  
-  return argc;
+ return argc;
 }
 
  
@@ -103,7 +33,7 @@ PetscErrorCode ComputeRHS(KSP ksp,Vec b,void *ctx)
 
   for (j=ys; j<ys+ym; j++) {
     for (i=xs; i<xs+xm; i++) {
-      array[j][i] =-Hx*Hy*user->RHS[j+1][i+1];
+      array[j][i] =-Hx*Hy*user->RHS[i+1][j+1];
 	
     }
   }
