@@ -110,8 +110,11 @@ int main(int argn, char** args)
 
 	pgm = read_pgm("mesh.pgm");
 
-//./sim -da_grid_x 65 -da_grid_y 17 -pc_type mg -ksp_atol 0.001 -pc_mg_levels 1 -mg_levels_0_pc_type lu -mg_levels_0_pc_factor_shift_type NONZERO -ksp_monitor
-  //./sim -da_grid_x 17 -da_grid_y 5 -pc_type mg -da_refine 2 -ksp_atol 0.01 -ksp_monitor
+//./sim -da_grid_x 65 -da_grid_y 17 -pc_type mg -pc_mg_levels 1 -mg_levels_0_pc_type lu -mg_levels_0_pc_factor_shift_type NONZERO -ksp_monitor
+//./sim -da_grid_x 65 -da_grid_y 17 -pc_type mg -da_refine 0 -ksp_atol 0.01 -ksp_monitor
+//./sim -da_grid_x 33 -da_grid_y 9 -pc_type mg -da_refine 1 -ksp_atol 0.01 -ksp_monitor
+//./sim -da_grid_x 17 -da_grid_y 5 -pc_type mg -da_refine 2 -ksp_atol 0.01 -ksp_monitor
+//./sim -da_grid_x 9 -da_grid_y 3 -pc_type mg -da_refine 3 -ksp_atol 0.001 -ksp_monitor
 
 /*sprintf(argv[2],"%d",imax);
 sprintf(argv[4],"%d",jmax);
