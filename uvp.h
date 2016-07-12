@@ -13,8 +13,7 @@ void update_T(
   double alpha, 
   double** T, 
   double** U, 
-  double** V, 
-  int** FLAG
+  double** V
   );
 
 /**
@@ -52,8 +51,7 @@ void calculate_fg(double Re,
   double **V, 
   double**T, 
   double **F,  
-  double **G, 
-  int** FLAG
+  double **G
   );
 
 
@@ -72,8 +70,7 @@ void calculate_rs(
   int jmax,
   double **F,
   double **G,
-  double **RS,
-  int** FLAG
+  double **RS
 );
 
 
@@ -122,8 +119,7 @@ void calculate_uv(
   double **V,
   double **F,
   double **G,
-  double **P,
-  int** FLAG
+  double **P
 );
 
 

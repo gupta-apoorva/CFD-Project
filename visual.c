@@ -2,17 +2,6 @@
 #include "visual.h"
 #include <stdio.h>
 
-
-#define B_N 2          
-#define B_S 1             // Defining the values to find boundary directions. 
-#define B_W 4
-#define B_E 8
-#define B_NE 9
-#define B_NW 5
-#define B_SE 10
-#define B_SW 6
-
-
 void write_vtkFile(const char *szProblem,
 		 int    timeStepNumber,
 		 double xlength,
@@ -24,86 +13,9 @@ void write_vtkFile(const char *szProblem,
      double **U,
      double **V,
      double **P,
-     double** T,
-     int** FLAG)
+     double** T)
 
 {
-
-for (int i = 1; i <=imax; ++i)
-  {
-    
-    for (int j = 1; j <=jmax; ++j)
-    {
-      if (FLAG[i][j] >=1 && FLAG[i][j] <=15)
-      {
-        if (FLAG[i][j] == B_E)
-        {
-          U[i][j] = 0;
-          V[i][i-1] = 0;
-          V[i][j] = 0;
-          P[i][j] = 0;
-
-        }
-        else if (FLAG[i][j] == B_W)
-        {
-          U[i-1][j] = 0;
-          V[i][j-1] = 0;
-          V[i][j] = 0;
-          P[i][j] = 0;
-
-        }
-        else if (FLAG[i][j]  == B_S)
-        {
-          V[i][j-1] = 0;
-          U[i][j] = 0;
-          U[i-1][j] = 0;
-          P[i][j] = 0; 
-        }
-        else if (FLAG[i][j]  == B_N)
-        {
-          V[i][j] =0;
-          U[i-1][j] = 0;
-          U[i][j] = 0;
-          P[i][j] = 0;
-          
-        }
-        else if (FLAG[i][j] == B_NE)
-        {
-          U[i][j] = 0;
-          V[i][j] = 0;
-          U[i-1][j] = 0;
-          V[i][j-1] = 0;
-          P[i][j] = 0;
-        }
-        else if (FLAG[i][j] == B_NW)
-        {
-          U[i-1][j] = 0;
-          V[i][j] = 0;
-          U[i][j] = 0;
-          V[i][j-1]= 0;
-          P[i][j] = 0;
-        }
-        else if (FLAG[i][j] == B_SE)
-        {
-          U[i][j] = 0;
-          V[i][j-1] = 0;
-          U[i-1][j] = 0;
-          V[i][j] = 0;
-          P[i][j] = 0;
-        }
-        else if (FLAG[i][j] == B_SW)
-        {
-          U[i-1][j] = 0;
-          V[i][j-1] = 0;
-          U[i][j] = 0;
-          V[i][j] = 0;
-          P[i][j] = 0;       
-        }
-
-      }
-    }
-  }
-
   int i,j;
   char szFileName[80];
   FILE *fp=NULL;

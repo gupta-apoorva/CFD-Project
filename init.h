@@ -66,7 +66,6 @@ int read_parameters( const char *szFileName,   /* name of the file */
                     int *wt,
                     int *wb,
                     double *beta,
-                    double* T_body,
                     double *T_l,
                     double *T_r,
                     double *T_t,

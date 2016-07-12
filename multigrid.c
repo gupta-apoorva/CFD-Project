@@ -18,7 +18,6 @@ PetscErrorCode ComputeRHS(KSP ksp,Vec b,void *ctx)
   ierr = DMDAGetCorners(da,&xs,&ys,0,&xm,&ym,0);CHKERRQ(ierr);
   ierr = DMDAVecGetArray(da, b, &array);CHKERRQ(ierr);
 
-
   for (j=ys; j<ys+ym; j++) {
     for (i=xs; i<xs+xm; i++) {
       array[j][i] =-Hx*Hy*user->RHS[i+1][j+1];
@@ -29,14 +28,6 @@ PetscErrorCode ComputeRHS(KSP ksp,Vec b,void *ctx)
   ierr = VecAssemblyBegin(b);CHKERRQ(ierr);
   ierr = VecAssemblyEnd(b);CHKERRQ(ierr);
 
-
- /* if (user->bcType == NEUMANN) {
-    MatNullSpace nullspace;
-
-    ierr = MatNullSpaceCreate(PETSC_COMM_WORLD,PETSC_TRUE,0,0,&nullspace);CHKERRQ(ierr);
-    ierr = MatNullSpaceRemove(nullspace,b);CHKERRQ(ierr);
-    ierr = MatNullSpaceDestroy(&nullspace);CHKERRQ(ierr);
-  }*/
   PetscFunctionReturn(0);
 }
 

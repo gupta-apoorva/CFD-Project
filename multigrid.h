@@ -9,8 +9,6 @@
 
 PetscErrorCode ComputeJacobian(KSP,Mat,Mat,void*);
 PetscErrorCode ComputeRHS(KSP,Vec,void*);
-PetscErrorCode ComputeTrueSolution(DM, Vec);
-PetscErrorCode VecView_VTK(Vec, const char [], const char []);
 PetscErrorCode KSPGetSolution(KSP ksp,Vec *v);
 typedef enum {DIRICHLET, NEUMANN} BCType;
 
