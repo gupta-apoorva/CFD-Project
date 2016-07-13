@@ -58,7 +58,6 @@ int read_parameters( const char *szFileName,   /* name of the file */
                     double *alpha,             /* uppwind differencing factor*/
                     double *omg,               /* relaxation factor */
                     double *tau,               /* safety factor for time step*/
-                    int  *itermax,             /* max. number of iterations  */
                     double *eps,               /* accuracy bound for pressure*/
                     double *dt_value,           /* time for output */
                     int *wl,

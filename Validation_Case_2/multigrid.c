@@ -1,4 +1,5 @@
 #include "multigrid.h"
+#include <omp.h>
  
 PetscErrorCode ComputeRHS(KSP ksp,Vec b,void *ctx)
 {
@@ -12,12 +13,13 @@ PetscErrorCode ComputeRHS(KSP ksp,Vec b,void *ctx)
   PetscFunctionBeginUser;
   ierr = KSPGetDM(ksp,&da);CHKERRQ(ierr);
   ierr = DMDAGetInfo(da, 0, &M, &N, 0,0,0,0,0,0,0,0,0,0);CHKERRQ(ierr);
-  Hx   = 1.0/(PetscReal)(M);
+  Hx   = 4.0/(PetscReal)(M);
   Hy   = 1.0/(PetscReal)(N);
 
   ierr = DMDAGetCorners(da,&xs,&ys,0,&xm,&ym,0);CHKERRQ(ierr);
   ierr = DMDAVecGetArray(da, b, &array);CHKERRQ(ierr);
 
+  #pragma omp parallel for
   for (j=ys; j<ys+ym; j++) {
     for (i=xs; i<xs+xm; i++) {
       array[j][i] =-Hx*Hy*user->RHS[i+1][j+1];
@@ -45,7 +47,7 @@ PetscErrorCode ComputeJacobian(KSP ksp,Mat J, Mat jac,void *ctx)
   ierr  = KSPGetDM(ksp,&da);CHKERRQ(ierr);
   ierr  = DMDAGetInfo(da,0,&M,&N,0,0,0,0,0,0,0,0,0,0);CHKERRQ(ierr);
 
-  Hx    = 1.0 / (PetscReal)(M);
+  Hx    = 4.0 / (PetscReal)(M);
   Hy    = 1.0 / (PetscReal)(N);
   HxdHy = Hx/Hy;
   HydHx = Hy/Hx;
@@ -94,9 +96,9 @@ PetscErrorCode ComputeJacobian(KSP ksp,Mat J, Mat jac,void *ctx)
   if (user->bcType == NEUMANN) {
     MatNullSpace nullspace;
 
-    ierr = MatNullSpaceCreate(PETSC_COMM_WORLD,PETSC_TRUE,0,0,&nullspace);CHKERRQ(ierr);
-    ierr = MatSetNullSpace(J,nullspace);CHKERRQ(ierr);
-    ierr = MatNullSpaceDestroy(&nullspace);CHKERRQ(ierr);
+  ierr = MatNullSpaceCreate(PETSC_COMM_WORLD,PETSC_TRUE,0,0,&nullspace);CHKERRQ(ierr);
+  ierr = MatSetNullSpace(J,nullspace);CHKERRQ(ierr);
+  ierr = MatNullSpaceDestroy(&nullspace);CHKERRQ(ierr);
   }
   PetscFunctionReturn(0);
 }

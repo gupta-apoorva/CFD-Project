@@ -1,6 +1,7 @@
 #include "helper.h"
 #include "visual.h"
 #include <stdio.h>
+#include <omp.h>
 
 void write_vtkFile(const char *szProblem,
 		 int    timeStepNumber,
@@ -36,6 +37,8 @@ void write_vtkFile(const char *szProblem,
 	
   fprintf(fp,"\n");
   fprintf(fp, "VECTORS velocity float\n");
+
+  #pragma omp parallel for ordered
   for(j = 0; j < jmax+1; j++) {
     for(i = 0; i < imax+1; i++) {
       fprintf(fp, "%f %f 0\n", (U[i][j] + U[i][j+1]) * 0.5, (V[i][j] + V[i+1][j]) * 0.5 );
@@ -57,6 +60,8 @@ void write_vtkFile(const char *szProblem,
   fprintf(fp,"CELL_DATA %i \n", ((imax)*(jmax)) );
   fprintf(fp, "SCALARS temperature float 1 \n"); 
   fprintf(fp, "LOOKUP_TABLE default \n");
+
+  #pragma omp parallel for ordered
   for(j = 1; j < jmax+1; j++) {
     for(i = 1; i < imax+1; i++) {
       fprintf(fp, "%f\n", T[i][j] );
@@ -101,6 +106,7 @@ void write_vtkPointCoordinates( FILE *fp, int imax, int jmax,
   int i = 0;
   int j = 0;
 
+  #pragma omp parallel for ordered
   for(j = 0; j < jmax+1; j++) {
     for(i = 0; i < imax+1; i++) {
       fprintf(fp, "%f %f 0\n", originX+(i*dx), originY+(j*dy) );

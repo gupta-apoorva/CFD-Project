@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "math.h"
+#include <omp.h>
 
 #define NO_SLIP 1         // defining the different kinds of boundary  conditions
 #define FREE_SLIP 2
@@ -104,6 +105,7 @@ void boundaryvalues(int imax,int jmax,int wl, int wr, int wt, int wb, double TI,
        }
 
 // Since the pressure P , T , F and G dosen't depend on the type of boundary so taking care of them together....
+    #pragma omp parallel for
 	for(int i=1; i<=imax; i++){
         	P[i][0] = P[i][1];
 			P[i][jmax+1] = P[i][jmax];
@@ -112,7 +114,7 @@ void boundaryvalues(int imax,int jmax,int wl, int wr, int wt, int wb, double TI,
         	G[i][0] = V[i][0];
         	G[i][jmax] = V[i][jmax]; 
     	}
-    
+    #pragma omp parallel for
 	for(int j=1; j<=jmax; j++){
         	P[0][j] = P[1][j];
 			P[imax+1][j] = P[imax][j];

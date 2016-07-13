@@ -2,6 +2,7 @@
 #include "helper.h"
 #include <stdlib.h>
 #include "math.h"
+#include <omp.h>
 
 /* calculate the tine stepping based on the value of tau*/
 
@@ -54,6 +55,7 @@ if (tau>0)
 
 void calculate_rs(double dt,double dx,double dy,  int imax,  int jmax,  double **F,  double **G,  double **RS)
 {
+#pragma omp parallel for
 for (int i=1;i<=imax;i++)
    {
      for (int j=1;j<=jmax;j++)
@@ -68,6 +70,7 @@ for (int i=1;i<=imax;i++)
 
 void calculate_uv(double dt,  double dx,  double dy,  int imax,  int jmax,double **U,  double **V,  double **F, double **G,double **P)
 {
+#pragma omp parallel for
 for (int i=1;i<=imax-1;i++)
   {
     for (int j =1;j<=jmax;j++)
@@ -75,7 +78,7 @@ for (int i=1;i<=imax-1;i++)
         U[i][j] = F[i][j] - dt/dx*(P[i+1][j] - P[i][j]);
       }
    }
-
+#pragma omp parallel for
 for (int i=1;i<=imax;i++)
   {
     for (int j =1;j<=jmax-1;j++)
@@ -91,6 +94,8 @@ for (int i=1;i<=imax;i++)
 void calculate_fg(double Re,double GX,double GY,double alpha,double dt,double dx,  double dy,int imax,int jmax, double beta, double **U,  double **V, double**T, double **F,  double **G)
   {
    double duvdy,du2dx,d2udx2,d2udy2,d2vdx2,d2vdy2,duvdx,dv2dy;
+
+   #pragma omp parallel for private (duvdy,du2dx,d2udx2,d2udy2)
    for (int i = 1; i <= imax-1; ++i)
   {
     for (int j = 1; j <= jmax; ++j)
@@ -104,6 +109,8 @@ void calculate_fg(double Re,double GX,double GY,double alpha,double dt,double dx
         F[i][j] = U[i][j] + dt*(1/Re*(d2udx2 + d2udy2) - du2dx - duvdy + GX) - beta*dt/2*(T[i][j] + T[i+1][j])*GX;
     }
   }
+
+  #pragma omp parallel for private (d2vdx2,d2vdy2,duvdx,dv2dy)
   for (int i =1;i<=imax;i++)
   {
     for (int j =1;j<=jmax-1;j++)
@@ -124,6 +131,7 @@ void calculate_fg(double Re,double GX,double GY,double alpha,double dt,double dx
 void update_T(int imax, int jmax, double Re, double Pr, double dt, double dx, double dy, double alpha, double** T, double** U, double** V)
   {
   double dUTdx, dVTdy, d2Tdx2, d2Tdy2;
+  #pragma omp parallel for private (dUTdx, dVTdy, d2Tdx2, d2Tdy2)
   for (int i =1;i<=imax;i++)
   {
    for (int j =1;j<=jmax-1;j++)

@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "multigrid.h"
+#include <omp.h>
 
 int main(int argn, char** args)
 {
@@ -42,8 +43,7 @@ int main(int argn, char** args)
     int  jmax;               
     double alpha;            
     double omg;               
-    double tau;              
-    int  itermax;             
+    double tau;            
     double eps;              
     double dt_value;          
     double** RS;
@@ -68,7 +68,7 @@ int main(int argn, char** args)
 	
 //setting the parameters
   	read_parameters( "problem.dat", &Re ,&Pr, &UI , &VI, &PI, &TI, &GX, &GY, &t_end, &xlength, &ylength, &dt, &dx, &dy, &imax,
-  		         &jmax, &alpha, &omg, &tau, &itermax, &eps, &dt_value, &wl, &wr, &wt, &wb, &beta, &T_l, &T_r, &T_t, &T_b);
+  		         &jmax, &alpha, &omg, &tau, &eps, &dt_value, &wl, &wr, &wt, &wb, &beta, &T_l, &T_r, &T_t, &T_b);
 
   	pgm = read_pgm("mesh.pgm");
 
@@ -147,6 +147,7 @@ int main(int argn, char** args)
       ierr =DMDAVecGetArray(da, x, &new);CHKERRQ(ierr);
 
 // Putting the values from the solver at correct location in P array.
+      #pragma omp parallel for
       for(int i = 0;i<imax;i++){
       for(int j = 0;j<jmax;j++){
          P[i+1][j+1] =new[j][i];
@@ -162,7 +163,7 @@ int main(int argn, char** args)
       t = t+dt;
       n = n+1;
 
-      printf("time = %f",t);  
+      printf("time = %f \n",t);  
 
       if (count % (int)dt_value == 0)
       write_vtkFile("szProblem.vtk", n, xlength, ylength, imax, jmax,dx, dy, U, V, P, T);
@@ -170,7 +171,7 @@ int main(int argn, char** args)
       count ++;
     }
 
-  //write_vtkFile("szProblem.vtk", n, xlength, ylength, imax, jmax,dx, dy, U, V, P, T);
+  write_vtkFile("szProblem.vtk", n, xlength, ylength, imax, jmax,dx, dy, U, V, P, T);
 
 free_matrix(U,0,imax+1,0,jmax+1);
 free_matrix(V,0,imax+1,0,jmax+1);
